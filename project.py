@@ -16,7 +16,7 @@ session = DBSession()
 @app.route("/shops")
 def entry_point():
     shops = session.query(ComputerShop).all()
-    return render_template('index.html')
+    return render_template('index.html', shops=shops)
 
 
 @app.route("/shop/new")
