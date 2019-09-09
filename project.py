@@ -1,11 +1,21 @@
 from flask import Flask, render_template
+from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker
+
+from database_model import Base, User, ComputerShop, Product
 
 app = Flask(__name__)
+
+engine = create_engine('sqlite:///computer_shop.db')
+Base.metadata.bind = engine
+DBSession = sessionmaker(bind=engine)
+session = DBSession()
 
 
 @app.route("/")
 @app.route("/shops")
 def entry_point():
+    shops = session.query(ComputerShop).all()
     return render_template('index.html')
 
 
