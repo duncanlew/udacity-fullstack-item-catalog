@@ -26,7 +26,9 @@ def create_new_shop():
 
 @app.route("/shop/<int:shop_id>")
 def get_shop(shop_id):
-    return 'display shop with shop id {}'.format(shop_id)
+    shop = session.query(ComputerShop).filter_by(id=shop_id).one()
+    products = session.query(Product).filter_by(computer_shop_id=shop.id).all()
+    return render_template('shop.html', shop=shop, products=products)
 
 
 @app.route("/shop/<int:shop_id>/edit")
