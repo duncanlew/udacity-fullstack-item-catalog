@@ -48,7 +48,9 @@ def create_product(shop_id):
 
 @app.route("/shop/<int:shop_id>/product/<int:product_id>")
 def get_product(shop_id, product_id):
-    return 'get product with product_id {0} and shop_id {1}'.format(product_id, shop_id)
+    shop = session.query(ComputerShop).filter_by(id=shop_id).one()
+    product = session.query(Product).filter_by(id=product_id).one()
+    return render_template('product.html', shop=shop, product=product)
 
 
 @app.route("/shop/<int:shop_id>/product/<int:product_id>/edit")
