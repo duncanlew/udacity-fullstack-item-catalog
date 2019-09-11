@@ -1,0 +1,13 @@
+{% extends 'base.html' %}
+
+{% block index %}
+<h2>{{ shop.name }}</h2>
+
+<h3>Edit my shop</h3>
+<form action="{{ url_for('edit_shop', shop_id=shop.id) }}" method="POST">
+    <p>Edit shop name: </p>
+    <input type="text" size="30" name="name">
+    <input type='submit' value='Change'>
+    <a href="{{ url_for('get_shop', shop_id=shop.id) }}">cancel</a>
+</form>
+{% endblock %}
