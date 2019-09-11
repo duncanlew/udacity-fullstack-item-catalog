@@ -1,12 +1,22 @@
 from flask import Flask, render_template
+from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker
+
+from database_model import Base, User, ComputerShop, Product
 
 app = Flask(__name__)
+
+engine = create_engine('sqlite:///computer_shop.db')
+Base.metadata.bind = engine
+DBSession = sessionmaker(bind=engine)
+session = DBSession()
 
 
 @app.route("/")
 @app.route("/shops")
 def entry_point():
-    return render_template('index.html')
+    shops = session.query(ComputerShop).all()
+    return render_template('index.html', shops=shops)
 
 
 @app.route("/shop/new")
@@ -16,7 +26,9 @@ def create_new_shop():
 
 @app.route("/shop/<int:shop_id>")
 def get_shop(shop_id):
-    return 'display shop with shop id {}'.format(shop_id)
+    shop = session.query(ComputerShop).filter_by(id=shop_id).one()
+    products = session.query(Product).filter_by(computer_shop_id=shop.id).all()
+    return render_template('shop.html', shop=shop, products=products)
 
 
 @app.route("/shop/<int:shop_id>/edit")
@@ -36,7 +48,9 @@ def create_product(shop_id):
 
 @app.route("/shop/<int:shop_id>/product/<int:product_id>")
 def get_product(shop_id, product_id):
-    return 'get product with product_id {0} and shop_id {1}'.format(product_id, shop_id)
+    shop = session.query(ComputerShop).filter_by(id=shop_id).one()
+    product = session.query(Product).filter_by(id=product_id).one()
+    return render_template('product.html', shop=shop, product=product)
 
 
 @app.route("/shop/<int:shop_id>/product/<int:product_id>/edit")
