@@ -61,9 +61,19 @@ def get_product(shop_id, product_id):
     return render_template('product.html', shop=shop, product=product)
 
 
-@app.route("/shop/<int:shop_id>/product/<int:product_id>/edit")
+@app.route("/shop/<int:shop_id>/product/<int:product_id>/edit", methods=["GET", "POST"])
 def edit_product(shop_id, product_id):
-    return 'edit product with product_id {0} and shop_id {1}'.format(product_id, shop_id)
+    shop = session.query(ComputerShop).filter_by(id=shop_id).one()
+    product = session.query(Product).filter_by(id=product_id).one()
+    if request.method == 'POST':
+        product.name = request.form["name"]
+        product.description = request.form["description"]
+        product.price = request.form["price"]
+        session.add(product)
+        session.commit()
+        return redirect(url_for('get_product', shop_id=shop_id, product_id=product_id))
+    else:
+        return render_template('product-edit.html', shop=shop, product=product)
 
 
 @app.route("/shop/<int:shop_id>/product/<int:product_id>/delete")
