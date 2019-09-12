@@ -1,0 +1,13 @@
+{% extends 'base.html' %}
+
+{% block index %}
+<h2> Making a new shop </h2>
+
+<h3>Make new shop</h3>
+<form action="{{ url_for('create_new_shop') }}" method="POST">
+    <p>My new shop name: </p>
+    <input type="text" size="30" name="name">
+    <input type='submit' value='Make new shop'>
+    <a href="{{ url_for('entry_point') }}">cancel</a>
+</form>
+{% endblock %}

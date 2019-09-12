@@ -19,9 +19,19 @@ def entry_point():
     return render_template('index.html', shops=shops)
 
 
-@app.route("/shop/new")
+@app.route("/shop/new", methods=["GET", "POST"])
 def create_new_shop():
-    return 'create new shop'
+    # TODO user authentication needs to be created
+    user = session.query(User).filter_by(id=1).one()
+
+    if request.method == 'POST':
+        if request.form['name']:
+            new_shop = ComputerShop(name=request.form['name'], user=user)
+            session.add(new_shop)
+            session.commit()
+        return redirect(url_for('entry_point'))
+    else:
+        return render_template('shop-new.html')
 
 
 @app.route("/shop/<int:shop_id>")
