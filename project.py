@@ -20,7 +20,7 @@ def entry_point():
 
 
 @app.route("/shop/new", methods=["GET", "POST"])
-def create_new_shop():
+def create_shop():
     # TODO user authentication needs to be created
     user = session.query(User).filter_by(id=1).one()
 
