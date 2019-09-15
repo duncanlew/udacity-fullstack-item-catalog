@@ -107,9 +107,18 @@ def edit_product(shop_id, product_id):
         return render_template('product-edit.html', shop=shop, product=product)
 
 
-@app.route("/shop/<int:shop_id>/product/<int:product_id>/delete")
+@app.route("/shop/<int:shop_id>/product/<int:product_id>/delete", methods=["GET", "POST"])
 def delete_product(shop_id, product_id):
-    return 'delete product with product_id {0} and shop_id {1}'.format(product_id, shop_id)
+    # TODO user authentication needs to be created
+    user = session.query(User).filter_by(id=1).one()
+    shop = session.query(ComputerShop).filter_by(id=shop_id).one()
+    product = session.query(Product).filter_by(id=product_id).one()
+    if request.method == 'POST':
+        session.delete(product)
+        session.commit()
+        return redirect(url_for('get_shop', shop_id=shop.id))
+    else:
+        return render_template('product-delete.html', shop=shop, product=product)
 
 
 if __name__ == "__main__":
