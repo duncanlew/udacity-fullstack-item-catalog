@@ -19,9 +19,19 @@ def entry_point():
     return render_template('index.html', shops=shops)
 
 
-@app.route("/shop/new")
-def create_new_shop():
-    return 'create new shop'
+@app.route("/shop/new", methods=["GET", "POST"])
+def create_shop():
+    # TODO user authentication needs to be created
+    user = session.query(User).filter_by(id=1).one()
+
+    if request.method == 'POST':
+        if request.form['name']:
+            new_shop = ComputerShop(name=request.form['name'], user=user)
+            session.add(new_shop)
+            session.commit()
+        return redirect(url_for('entry_point'))
+    else:
+        return render_template('shop-new.html')
 
 
 @app.route("/shop/<int:shop_id>")
@@ -49,9 +59,22 @@ def delete_shop(shop_id):
     return 'delete shop with shop id {}'.format(shop_id)
 
 
-@app.route("/shop/<int:shop_id>/product/new")
+@app.route("/shop/<int:shop_id>/product/new", methods=["GET", "POST"])
 def create_product(shop_id):
-    return 'create product for ship_id {}'.format(shop_id)
+    # TODO user authentication needs to be created
+    user = session.query(User).filter_by(id=1).one()
+    shop = session.query(ComputerShop).filter_by(id=shop_id).one()
+    if request.method == 'POST':
+        name = request.form['name']
+        description = request.form['description']
+        price = request.form['price']
+        new_product = Product(name=name, description=description, price=price,
+                              computer_shop=shop)
+        session.add(new_product)
+        session.commit()
+        return redirect(url_for('get_shop', shop_id=shop.id))
+    else:
+        return render_template('product-new.html', shop=shop)
 
 
 @app.route("/shop/<int:shop_id>/product/<int:product_id>")
