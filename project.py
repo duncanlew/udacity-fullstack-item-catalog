@@ -54,9 +54,17 @@ def edit_shop(shop_id):
         return render_template('shop-edit.html', shop=shop)
 
 
-@app.route("/shop/<int:shop_id>/delete")
+@app.route("/shop/<int:shop_id>/delete", methods=["GET", "POST"])
 def delete_shop(shop_id):
-    return 'delete shop with shop id {}'.format(shop_id)
+    # TODO user authentication needs to be created
+    user = session.query(User).filter_by(id=1).one()
+    shop = session.query(ComputerShop).filter_by(id=shop_id).one()
+    if request.method == 'POST':
+        session.delete(shop)
+        session.commit()
+        return redirect(url_for('entry_point'))
+    else:
+        return render_template('shop-delete.html', shop=shop)
 
 
 @app.route("/shop/<int:shop_id>/product/new", methods=["GET", "POST"])
