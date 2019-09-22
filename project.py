@@ -12,6 +12,7 @@ DBSession = sessionmaker(bind=engine)
 db_session = DBSession()
 
 
+# TODO rename entry_point to home
 @app.route("/")
 @app.route("/shops")
 def entry_point():
@@ -123,11 +124,15 @@ def delete_product(shop_id, product_id):
 
 @app.route("/login", methods=["GET", "POST"])
 def login():
-    if 'username' in flask_session:
-        username = flask_session['username']
+    mything = request # TODO remove
+    if request.method == "POST":
+        pass
     else:
-        username = ''
-    return render_template('login.html', username=username)
+        if 'username' in flask_session:
+            username = flask_session['username']
+        else:
+            username = ''
+        return render_template('login.html', username=username)
 
 
 if __name__ == "__main__":
