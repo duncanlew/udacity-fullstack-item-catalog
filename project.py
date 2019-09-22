@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, url_for, session as login_session
+from flask import Flask, render_template, request, redirect, url_for, session as flask_session
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
@@ -123,8 +123,8 @@ def delete_product(shop_id, product_id):
 
 @app.route("/login", methods=["GET", "POST"])
 def login():
-    if 'username' in login_session:
-        username = login_session['username']
+    if 'username' in flask_session:
+        username = flask_session['username']
     else:
         username = ''
     return render_template('login.html', username=username)
