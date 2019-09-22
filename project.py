@@ -125,14 +125,22 @@ def delete_product(shop_id, product_id):
 @app.route("/login", methods=["GET", "POST"])
 def login():
     mything = request # TODO remove
+    login_incorrect = False
     if request.method == "POST":
-        pass
+        username = request.form['email']
+        password = request.form['password']
+        user = db_session.query(User).filter_by(username=username).first()
+        if not user or not user.verify_password(password):
+            login_incorrect = True
+            return render_template('login.html', login_incorrect=login_incorrect)
+        # TODO add to session
+        return '<h1>Login successful!</h1>'
     else:
         if 'username' in flask_session:
             username = flask_session['username']
         else:
             username = ''
-        return render_template('login.html', username=username)
+        return render_template('login.html', login_incorrect=login_incorrect)
 
 
 if __name__ == "__main__":
