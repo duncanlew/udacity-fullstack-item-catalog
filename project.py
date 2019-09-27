@@ -1,5 +1,5 @@
 from flask import Flask, render_template, request, redirect, url_for, session as flask_session
-from flask_oauth import OAuth
+from flask_oauthlib.client import OAuth
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
@@ -171,7 +171,7 @@ def login():
 
 
 @app.route('/twitter-login')
-def login():
+def twitter_login():
     return twitter.authorize(
         callback=url_for('oauth_authorized',
                          next=request.args.get('next') or request.referrer or None))
@@ -180,20 +180,24 @@ def login():
 @app.route('/twitter-oauth-authorized')
 @twitter.authorized_handler
 def oauth_authorized(resp):
+    # TODO change url for index
     next_url = request.args.get('next') or url_for('index')
     print('my next url')
     print(next_url)
+    myRequest = request
+    myResponse = resp
     if resp is None:
         # flash(u'You denied the request to sign in.')
         return redirect(next_url)
 
-    flask_session['user_name'] = resp['screen_name']
+    flask_session['username'] = resp['screen_name']
     flask_session['twitter_token'] = (
         resp['oauth_token'],
         resp['oauth_token_secret']
     )
 
-    return redirect(url_for('index'))
+    # TODO where to redirect to
+    return redirect(url_for('login'))
 
 
 @app.route("/logout", methods=["GET", "POST"])
