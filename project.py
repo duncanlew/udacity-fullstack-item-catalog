@@ -5,7 +5,7 @@ from sqlalchemy.orm import sessionmaker
 from database_model import Base, User, ComputerShop, Product
 
 app = Flask(__name__)
-app.secret_key = "super secret key"  # TODO what to do with the secret key
+app.secret_key = "super secret key"
 
 engine = create_engine('sqlite:///computer_shop.db')
 Base.metadata.bind = engine
@@ -146,7 +146,7 @@ def login():
 
 @app.route("/logout", methods=["GET", "POST"])
 def logout():
-    flask_session.pop('username')
+    flask_session.pop('username', None)
     return redirect(url_for('entry_point'))
 
 
