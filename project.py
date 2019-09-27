@@ -5,6 +5,7 @@ from sqlalchemy.orm import sessionmaker
 from database_model import Base, User, ComputerShop, Product
 
 app = Flask(__name__)
+app.secret_key = "super secret key"
 
 engine = create_engine('sqlite:///computer_shop.db')
 Base.metadata.bind = engine
@@ -124,7 +125,6 @@ def delete_product(shop_id, product_id):
 
 @app.route("/login", methods=["GET", "POST"])
 def login():
-    mything = request # TODO remove
     login_incorrect = False
     if request.method == "POST":
         username = request.form['email']
@@ -133,14 +133,15 @@ def login():
         if not user or not user.verify_password(password):
             login_incorrect = True
             return render_template('login.html', login_incorrect=login_incorrect)
-        # TODO add to session
-        return '<h1>Login successful!</h1>'
+        else:
+            flask_session['username'] = username
+            return '<h1>Login successful!</h1><div>{0}</div>'.format(username)
     else:
         if 'username' in flask_session:
             username = flask_session['username']
+            return '<h1>Hello {0}, you\'re already logged in</h1>'.format(username)
         else:
-            username = ''
-        return render_template('login.html', login_incorrect=login_incorrect)
+            return render_template('login.html', login_incorrect=login_incorrect)
 
 
 if __name__ == "__main__":
