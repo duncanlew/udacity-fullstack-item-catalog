@@ -33,6 +33,12 @@ twitter = oauth.remote_app('twitter',
                            consumer_secret='ADD TWITTER CONSUMER SECRET'
                            )
 
+
+@twitter.tokengetter
+def get_twitter_token(token=None):
+    return flask_session.get('twitter_token')
+
+
 # TODO rename entry_point to home
 @app.route("/")
 @app.route("/shops")
@@ -162,6 +168,33 @@ def login():
             return '<h1>Hello {0}, you\'re already logged in</h1>'.format(username)
         else:
             return render_template('login.html', login_incorrect=login_incorrect)
+
+
+@app.route('/twitter-login')
+def login():
+    return twitter.authorize(
+        callback=url_for('oauth_authorized',
+                         next=request.args.get('next') or request.referrer or None))
+
+
+@app.route('/oauth-authorized')
+@twitter.authorized_handler
+def oauth_authorized(resp):
+    next_url = request.args.get('next') or url_for('index')
+    if resp is None:
+        # flash(u'You denied the request to sign in.')
+        return redirect(next_url)
+
+    access_token = resp['oauth_token']
+    flask_session['access_token'] = access_token
+    flask_session['screen_name'] = resp['screen_name']
+
+    flask_session['twitter_token'] = (
+        resp['oauth_token'],
+        resp['oauth_token_secret']
+    )
+
+    return redirect(url_for('index'))
 
 
 @app.route("/logout", methods=["GET", "POST"])
