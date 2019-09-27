@@ -144,6 +144,12 @@ def login():
             return render_template('login.html', login_incorrect=login_incorrect)
 
 
+@app.route("/logout", methods=["GET", "POST"])
+def logout():
+    flask_session.pop('username')
+    return redirect(url_for('entry_point'))
+
+
 if __name__ == "__main__":
     app.debug = True
     app.run(port=8080)
