@@ -177,7 +177,7 @@ def login():
                          next=request.args.get('next') or request.referrer or None))
 
 
-@app.route('/oauth-authorized')
+@app.route('/twitter-oauth-authorized')
 @twitter.authorized_handler
 def oauth_authorized(resp):
     next_url = request.args.get('next') or url_for('index')
