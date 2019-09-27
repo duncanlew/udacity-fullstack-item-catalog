@@ -181,14 +181,13 @@ def login():
 @twitter.authorized_handler
 def oauth_authorized(resp):
     next_url = request.args.get('next') or url_for('index')
+    print('my next url')
+    print(next_url)
     if resp is None:
         # flash(u'You denied the request to sign in.')
         return redirect(next_url)
 
-    access_token = resp['oauth_token']
-    flask_session['access_token'] = access_token
-    flask_session['screen_name'] = resp['screen_name']
-
+    flask_session['user_name'] = resp['screen_name']
     flask_session['twitter_token'] = (
         resp['oauth_token'],
         resp['oauth_token_secret']
@@ -200,6 +199,7 @@ def oauth_authorized(resp):
 @app.route("/logout", methods=["GET", "POST"])
 def logout():
     flask_session.pop('username', None)
+    flask_session.pop('twitter_token', None)
     return redirect(url_for('entry_point'))
 
 
