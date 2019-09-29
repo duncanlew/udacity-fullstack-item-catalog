@@ -33,7 +33,7 @@ def get_twitter_token(token=None):
 # TODO rename entry_point to home
 @app.route("/")
 @app.route("/shops")
-def entry_point():
+def home():
     shops = db_session.query(ComputerShop).all()
     return render_template('index.html', shops=shops)
 
@@ -48,7 +48,7 @@ def create_shop():
             new_shop = ComputerShop(name=request.form['name'], user=user)
             db_session.add(new_shop)
             db_session.commit()
-        return redirect(url_for('entry_point'))
+        return redirect(url_for('home'))
     else:
         return render_template('shop-new.html')
 
@@ -81,7 +81,7 @@ def delete_shop(shop_id):
     if request.method == 'POST':
         db_session.delete(shop)
         db_session.commit()
-        return redirect(url_for('entry_point'))
+        return redirect(url_for('home'))
     else:
         return render_template('shop-delete.html', shop=shop)
 
@@ -169,14 +169,9 @@ def twitter_login():
 
 
 @app.route('/twitter-oauth-authorized')
-@twitter.authorized_handler
-def oauth_authorized(resp):
-    # TODO change url for index
-    next_url = request.args.get('next') or url_for('index')
-    print('my next url')
-    print(next_url)
-    myRequest = request
-    myResponse = resp
+def oauth_authorized():
+    next_url = request.args.get('next') or url_for('home')  # TODO this might not be that needed
+    resp = twitter.authorized_response()
     if resp is None:
         # TODO remove this or add something in html
         # flash(u'You denied the request to sign in.')
@@ -196,7 +191,7 @@ def oauth_authorized(resp):
 def logout():
     flask_session.pop('username', None)
     flask_session.pop('twitter_token', None)
-    return redirect(url_for('entry_point'))
+    return redirect(url_for('home'))
 
 
 if __name__ == "__main__":
