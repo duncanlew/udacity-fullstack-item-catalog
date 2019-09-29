@@ -1,4 +1,4 @@
 Flask
 sqlalchemy
 passlib
-Flask-OAuth
+Flask-OAuthlib
