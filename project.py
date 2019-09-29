@@ -14,7 +14,6 @@ Base.metadata.bind = engine
 DBSession = sessionmaker(bind=engine)
 db_session = DBSession()
 
-# Use Twitter as example remote application
 twitter = oauth.remote_app('twitter',
                            base_url='https://api.twitter.com/1/',
                            request_token_url='https://api.twitter.com/oauth/request_token',
@@ -177,7 +176,14 @@ def oauth_authorized():
         # flash(u'You denied the request to sign in.')
         return redirect(next_url)
 
-    flask_session['username'] = resp['screen_name']
+    twitter_username = resp['screen_name']
+    user = db_session.query(User).filter_by(username=twitter_username).first()
+    if not user:
+        user = User(username=twitter_username)
+        db_session.add(user)
+        db_session.commit()
+
+    flask_session['username'] = twitter_username
     flask_session['twitter_token'] = (
         resp['oauth_token'],
         resp['oauth_token_secret']

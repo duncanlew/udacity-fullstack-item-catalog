@@ -12,10 +12,6 @@ class User(Base):
     username = Column(String(32), index=True)
     password_hash = Column(String(64))
 
-    def __init__(self, username, password):
-        self.username = username
-        self.hash_password(password)
-
     def hash_password(self, password):
         self.password_hash = pwd_context.hash(password)
 
