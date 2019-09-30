@@ -2,10 +2,28 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
     <title>Computer Shops </title>
 </head>
 <body>
-<h1>Computer Shop Aggregator</h1>
+<header>
+    <div class="navbar-fixed">
+        <nav>
+            <div class="nav-wrapper">
+                <a href="{{ url_for('home') }}" class="brand-logo center">Computer Shop Aggregator</a>
+                <ul class="right hide-on-med-and-down">
+                    {% if username %}
+                    <li>{{username}}</li>
+                    <li>Logout</li>
+                    {% else %}
+                    <li><a class="waves-effect waves-light btn" href="{{ url_for('login') }}">Sign in</a></li>
+                    {% endif %}
+                </ul>
+            </div>
+        </nav>
+    </div>
+</header>
 {% block index %}
 {% endblock %}
 </body>

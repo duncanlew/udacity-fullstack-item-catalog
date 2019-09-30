@@ -34,7 +34,7 @@ def get_twitter_token(token=None):
 @app.route("/shops")
 def home():
     shops = db_session.query(ComputerShop).all()
-    return render_template('index.html', shops=shops)
+    return render_template('index.html', shops=shops, username=flask_session.get('username'))
 
 
 @app.route("/shop/new", methods=["GET", "POST"])
