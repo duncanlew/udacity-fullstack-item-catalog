@@ -12,6 +12,11 @@
     <input type="password" size="30" name="password" required>
     <br>
     <input type='submit' value='Login'>
-    <a href="{{ url_for('entry_point') }}">cancel</a>
+    <a href="{{ url_for('home') }}">cancel</a>
 </form>
+
+Sign in with twitter.
+
+<a href="{{ url_for('twitter_login') }}"><img src="{{
+        url_for('static', filename='sign-in.png')}}" alt="sign in"></a>
 {% endblock %}

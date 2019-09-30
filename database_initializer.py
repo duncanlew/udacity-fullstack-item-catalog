@@ -16,25 +16,26 @@ Base.metadata.bind = engine
 # revert all of them back to the last commit by calling
 # session.rollback()
 DBSession = sessionmaker(bind=engine)
-session = DBSession()
+db_session = DBSession()
 
-user = User('admin', 'admin')
+user = User(username='admin')
+user.hash_password('admin')
 
 computer_shop_1 = ComputerShop(name="Fruity Tech Store", user=user)
 computer_shop_2 = ComputerShop(name="Super Duper Tech Shop", user=user)
 computer_shop_3 = ComputerShop(name="Android Phone Shop", user=user)
 
-session.add(user)
-session.commit()
+db_session.add(user)
+db_session.commit()
 
-session.add(computer_shop_1)
-session.commit()
+db_session.add(computer_shop_1)
+db_session.commit()
 
-session.add(computer_shop_2)
-session.commit()
+db_session.add(computer_shop_2)
+db_session.commit()
 
-session.add(computer_shop_3)
-session.commit()
+db_session.add(computer_shop_3)
+db_session.commit()
 
 # Products of computer shop 1
 product_1 = Product(name="MacBook Pro 2019", description="Excellent choice as a portable computer", price="1599.99",
@@ -79,56 +80,56 @@ product_17 = Product(name="Samsung Galaxy A10", description="Mid range for an af
 product_18 = Product(name="Samsung Galaxy A20", description="Mid range phone for those who needs more power",
                      price="599.99", computer_shop=computer_shop_3)
 
-session.add(product_1)
-session.commit()
+db_session.add(product_1)
+db_session.commit()
 
-session.add(product_2)
-session.commit()
+db_session.add(product_2)
+db_session.commit()
 
-session.add(product_3)
-session.commit()
+db_session.add(product_3)
+db_session.commit()
 
-session.add(product_4)
-session.commit()
+db_session.add(product_4)
+db_session.commit()
 
-session.add(product_5)
-session.commit()
+db_session.add(product_5)
+db_session.commit()
 
-session.add(product_6)
-session.commit()
+db_session.add(product_6)
+db_session.commit()
 
-session.add(product_7)
-session.commit()
+db_session.add(product_7)
+db_session.commit()
 
-session.add(product_8)
-session.commit()
+db_session.add(product_8)
+db_session.commit()
 
-session.add(product_9)
-session.commit()
+db_session.add(product_9)
+db_session.commit()
 
-session.add(product_10)
-session.commit()
+db_session.add(product_10)
+db_session.commit()
 
-session.add(product_11)
-session.commit()
+db_session.add(product_11)
+db_session.commit()
 
-session.add(product_12)
-session.commit()
+db_session.add(product_12)
+db_session.commit()
 
-session.add(product_13)
-session.commit()
+db_session.add(product_13)
+db_session.commit()
 
-session.add(product_14)
-session.commit()
+db_session.add(product_14)
+db_session.commit()
 
-session.add(product_15)
-session.commit()
+db_session.add(product_15)
+db_session.commit()
 
-session.add(product_16)
-session.commit()
+db_session.add(product_16)
+db_session.commit()
 
-session.add(product_17)
-session.commit()
+db_session.add(product_17)
+db_session.commit()
 
-session.add(product_18)
-session.commit()
+db_session.add(product_18)
+db_session.commit()

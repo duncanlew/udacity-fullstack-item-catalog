@@ -1,4 +1,5 @@
 from flask import Flask, render_template, request, redirect, url_for, session as flask_session
+from flask_oauthlib.client import OAuth
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
@@ -6,17 +7,32 @@ from database_model import Base, User, ComputerShop, Product
 
 app = Flask(__name__)
 app.secret_key = "super secret key"
+oauth = OAuth()
 
 engine = create_engine('sqlite:///computer_shop.db')
 Base.metadata.bind = engine
 DBSession = sessionmaker(bind=engine)
 db_session = DBSession()
 
+twitter = oauth.remote_app('twitter',
+                           base_url='https://api.twitter.com/1/',
+                           request_token_url='https://api.twitter.com/oauth/request_token',
+                           access_token_url='https://api.twitter.com/oauth/access_token',
+                           authorize_url='https://api.twitter.com/oauth/authenticate',
+                           consumer_key='YOUR_CONSUMER_KEY',
+                           consumer_secret='YOUR_CONSUMER_SECRET'
+                           )
+
+
+@twitter.tokengetter
+def get_twitter_token(token=None):
+    return flask_session.get('twitter_token')
+
 
 # TODO rename entry_point to home
 @app.route("/")
 @app.route("/shops")
-def entry_point():
+def home():
     shops = db_session.query(ComputerShop).all()
     return render_template('index.html', shops=shops)
 
@@ -31,7 +47,7 @@ def create_shop():
             new_shop = ComputerShop(name=request.form['name'], user=user)
             db_session.add(new_shop)
             db_session.commit()
-        return redirect(url_for('entry_point'))
+        return redirect(url_for('home'))
     else:
         return render_template('shop-new.html')
 
@@ -64,7 +80,7 @@ def delete_shop(shop_id):
     if request.method == 'POST':
         db_session.delete(shop)
         db_session.commit()
-        return redirect(url_for('entry_point'))
+        return redirect(url_for('home'))
     else:
         return render_template('shop-delete.html', shop=shop)
 
@@ -144,10 +160,44 @@ def login():
             return render_template('login.html', login_incorrect=login_incorrect)
 
 
+@app.route('/twitter-login')
+def twitter_login():
+    return twitter.authorize(
+        callback=url_for('oauth_authorized',
+                         next=request.args.get('next') or request.referrer or None))
+
+
+@app.route('/twitter-oauth-authorized')
+def oauth_authorized():
+    next_url = request.args.get('next') or url_for('home')  # TODO this might not be that needed
+    resp = twitter.authorized_response()
+    if resp is None:
+        # TODO remove this or add something in html
+        # flash(u'You denied the request to sign in.')
+        return redirect(next_url)
+
+    twitter_username = resp['screen_name']
+    user = db_session.query(User).filter_by(username=twitter_username).first()
+    if not user:
+        user = User(username=twitter_username)
+        db_session.add(user)
+        db_session.commit()
+
+    flask_session['username'] = twitter_username
+    flask_session['twitter_token'] = (
+        resp['oauth_token'],
+        resp['oauth_token_secret']
+    )
+
+    # TODO where to redirect to
+    return redirect(url_for('login'))
+
+
 @app.route("/logout", methods=["GET", "POST"])
 def logout():
     flask_session.pop('username', None)
-    return redirect(url_for('entry_point'))
+    flask_session.pop('twitter_token', None)
+    return redirect(url_for('home'))
 
 
 if __name__ == "__main__":
