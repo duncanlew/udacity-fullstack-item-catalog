@@ -1,13 +1,28 @@
 {% extends 'base.html' %}
 
 {% block index %}
-<h2> Making a new shop </h2>
+<div class="row">
+    <div class="col s12">
+        <h3 class="red-text">Create a new shop</h3>
+    </div>
+</div>
 
-<h3>Make new shop</h3>
-<form action="{{ url_for('create_shop') }}" method="POST">
-    <p>My new shop name: </p>
-    <input type="text" size="30" name="name">
-    <input type='submit' value='Make new shop'>
-    <a href="{{ url_for('home') }}">cancel</a>
-</form>
+<div class="row">
+    <form action="{{ url_for('create_shop') }}" method="POST">
+        <div class="col s12 input-field">
+            <input id="name" type="text" size="30" name="name" required="required">
+            <label for="name">Shop name</label>
+        </div>
+
+        <div class="col s12">
+            <button class="btn waves-effect waves-light red" type="submit" name="action">
+                Submit
+                <i class="material-icons right">send</i>
+            </button>
+            <span>
+                or <a href="{{ url_for('home') }}">go back</a>
+            </span>
+        </div>
+    </form>
+</div>
 {% endblock %}

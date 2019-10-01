@@ -3,10 +3,65 @@
 <head>
     <meta charset="UTF-8">
     <title>Computer Shops </title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='main.css') }}">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
 </head>
 <body>
-<h1>Computer Shop Aggregator</h1>
-{% block index %}
-{% endblock %}
+<header>
+    <div class="navbar-fixed">
+        <nav>
+            <div class="nav-wrapper red accent-2">
+                <a href="{{ url_for('home') }}" class="brand-logo center">Computer Shop Aggregator</a>
+                <ul class="right ">
+                    {% if username %}
+                    <li><a class="dropdown-trigger" href="#!" data-target="dropdown1">
+                        <i class="material-icons left">face</i>
+                        {{username}}
+                    </a></li>
+
+                    <!-- Dropdown Structure -->
+                    <ul id="dropdown1" class="dropdown-content">
+                        <li><a href="{{ url_for('logout') }}">Sign out</a></li>
+                    </ul>
+
+                    {% else %}
+                    <li><a class="waves-effect waves-light btn red" href="{{ url_for('login') }}">Sign in</a></li>
+
+                    {% endif %}
+                </ul>
+            </div>
+        </nav>
+    </div>
+</header>
+<main>
+    {% block index %}
+    {% endblock %}
+</main>
+<footer class="page-footer red accent-2">
+    <div class="container">
+        <div class="row">
+            <div class="col l6 s12">
+                <h5 class="white-text">Computer Shop Aggregator</h5>
+                <p class="grey-text text-lighten-4">Newtonstraat 55, The Netherlands</p>
+            </div>
+        </div>
+    </div>
+    <div class="footer-copyright">
+        <div class="container">
+            © 2019 Computer Shop Aggregator
+        </div>
+    </div>
+</footer>
+<script type="text/javascript">
+    $(document).ready(function () {
+        $('.collapsible').collapsible();
+        $(".dropdown-trigger").dropdown({
+            coverTrigger: false
+        });
+    });
+</script>
 </body>
 </html>

@@ -1,9 +1,52 @@
 {% extends 'base.html' %}
 
 {% block index %}
-<h2>{{ shop.name }} </h2>
-<h3>{{ product.name }}</h3>
-<p>{{ product.description }}</p>
-<p>{{ product.price }}</p>
+<div class="row">
+    <div class="col s12">
+        <h3 class="red-text">{{ shop.name }}</h3>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col s12">
+        <h6>Product information</h6>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col s12">
+        <table>
+            <tbody>
+            <tr>
+                <td><strong>Name</strong></td>
+                <td>{{ product.name }}</td>
+            </tr>
+            <tr>
+                <td><strong>Description</strong></td>
+                <td>{{ product.description }}</td>
+            </tr>
+            <tr>
+                <td><strong>Price</strong></td>
+                <td>&#128; {{ product.price }}</td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col s12">
+        <div>
+            <a href="{{ url_for('edit_product', shop_id=shop.id, product_id=product.id)}}"
+               class="btn-floating btn waves-effect waves-light red">
+                <i class="material-icons left">edit</i>
+            </a>
+            <a href="{{ url_for('delete_product', shop_id=shop.id, product_id=product.id)}}"
+               class="btn-floating btn waves-effect waves-light red">
+                <i class="material-icons left">delete</i>
+            </a>
+        </div>
+    </div>
+</div>
 
 {% endblock %}
