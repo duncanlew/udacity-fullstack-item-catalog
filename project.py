@@ -62,13 +62,15 @@ def get_shop(shop_id):
 
 @app.route("/shop/<int:shop_id>/edit", methods=["GET", "POST"])
 def edit_shop(shop_id):
+    # TODO authorization needs to be added
+    username = flask_session.get('username')
     shop = db_session.query(ComputerShop).filter_by(id=shop_id).one()
     if request.method == 'POST':
         if request.form['name']:
             shop.name = request.form['name']
             db_session.add(shop)
             db_session.commit()
-        return redirect(url_for('get_shop', shop_id=shop_id))
+        return redirect(url_for('get_shop', shop_id=shop_id, username=username))
     else:
         return render_template('shop-edit.html', shop=shop)
 
