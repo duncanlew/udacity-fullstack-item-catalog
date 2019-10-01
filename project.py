@@ -72,7 +72,7 @@ def edit_shop(shop_id):
             db_session.commit()
         return redirect(url_for('get_shop', shop_id=shop_id, username=username))
     else:
-        return render_template('shop-edit.html', shop=shop)
+        return render_template('shop-edit.html', shop=shop, username=username)
 
 
 @app.route("/shop/<int:shop_id>/delete", methods=["GET", "POST"])
