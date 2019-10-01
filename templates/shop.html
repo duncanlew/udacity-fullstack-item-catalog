@@ -1,15 +1,22 @@
 {% extends 'base.html' %}
 
 {% block index %}
-<h2>{{ shop.name }}</h2>
-<ul>
-{% for product in products %}
+<h3>{{ shop.name }}</h3>
+<ul class="collapsible">
+    {% for product in products %}
     <li>
-        {{ product.name }} <br>
-        {{ product.description}} <br>
-        {{ product.price }}
+        <div class="collapsible-header">{{ product.name }}</div>
+        <div class="collapsible-body">
+            {{ product.description}} <br>
+            {{ product.price }}
+        </div>
     </li>
-{% endfor %}
+    {% endfor %}
 </ul>
 
 {% endblock %}
+<!--<script>-->
+<!--    $(document).ready(function () {-->
+<!--        $('.collapsible').collapsible();-->
+<!--    });-->
+<!--</script>-->
