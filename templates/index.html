@@ -8,7 +8,7 @@
 {% if username %}
 <div class="row">
     <div class="col s12">
-        <a href="{{ url_for('create_shop')}}" class="waves-effect waves-light btn">
+        <a href="{{ url_for('create_shop')}}" class="waves-effect waves-light btn red">
             <i class="material-icons left">add</i>
             Create shop
         </a>
@@ -21,15 +21,15 @@
         <ul class="collection">
             {% for shop in shops %}
             <li class="collection-item">
-                <a class="teal-text" href="{{ url_for('get_shop', shop_id=shop.id) }}">
+                <a class="red-text" href="{{ url_for('get_shop', shop_id=shop.id) }}">
                     <i class="material-icons">business</i>
                     {{ shop.name }}
                 </a>
                 {% if shop.user.username == username %}
-                <a href="{{ url_for('delete_shop', shop_id=shop.id) }}" class="secondary-content">
+                <a href="{{ url_for('delete_shop', shop_id=shop.id) }}" class="secondary-content red-text">
                     <i class="material-icons">delete</i>
                 </a>
-                <a href="{{ url_for('edit_shop', shop_id=shop.id) }}" class="secondary-content">
+                <a href="{{ url_for('edit_shop', shop_id=shop.id) }}" class="secondary-content red-text">
                     <i class="material-icons">edit</i>
                 </a>
                 {% endif %}
