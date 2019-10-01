@@ -38,8 +38,9 @@ def home():
 
 @app.route("/shop/new", methods=["GET", "POST"])
 def create_shop():
-    # TODO user authentication needs to be created
-    user = db_session.query(User).filter_by(id=1).one()
+    username = flask_session.get('username')
+    user = db_session.query(User).filter_by(username=username).one()
+    # TODO if user does not exist redirect please
 
     if request.method == 'POST':
         if request.form['name']:
