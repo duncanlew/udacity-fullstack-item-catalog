@@ -32,8 +32,9 @@ def get_twitter_token(token=None):
 @app.route("/")
 @app.route("/shops")
 def home():
+    username = flask_session.get('username')
     shops = db_session.query(ComputerShop).all()
-    return render_template('index.html', shops=shops, username=flask_session.get('username'))
+    return render_template('index.html', shops=shops, username=username)
 
 
 @app.route("/shop/new", methods=["GET", "POST"])
@@ -49,7 +50,7 @@ def create_shop():
             db_session.commit()
         return redirect(url_for('home'))
     else:
-        return render_template('shop-new.html')
+        return render_template('shop-new.html', username=username)
 
 
 @app.route("/shop/<int:shop_id>")
