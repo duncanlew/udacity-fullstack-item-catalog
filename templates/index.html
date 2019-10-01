@@ -3,10 +3,15 @@
 {% block index %}
 <div class="row">
     <div class="col s12"><h2>Available Shops </h2></div>
+</div>
+<div class="row">
     <div class="col s12">
         <div class="collection">
             {% for shop in shops %}
-            <a href="{{ url_for('get_shop', shop_id=shop.id) }}" class="collection-item">{{ shop.name }}</a>
+            <a href="{{ url_for('get_shop', shop_id=shop.id) }}" class="collection-item">
+                <i class="material-icons">business</i>
+                {{ shop.name }}
+            </a>
             {% endfor %}
         </div>
     </div>
