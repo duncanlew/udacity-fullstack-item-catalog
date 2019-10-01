@@ -29,7 +29,6 @@ def get_twitter_token(token=None):
     return flask_session.get('twitter_token')
 
 
-# TODO rename entry_point to home
 @app.route("/")
 @app.route("/shops")
 def home():
@@ -56,7 +55,7 @@ def create_shop():
 def get_shop(shop_id):
     shop = db_session.query(ComputerShop).filter_by(id=shop_id).one()
     products = db_session.query(Product).filter_by(computer_shop_id=shop.id).all()
-    return render_template('shop.html', shop=shop, products=products)
+    return render_template('shop.html', shop=shop, products=products, username=flask_session.get('username'))
 
 
 @app.route("/shop/<int:shop_id>/edit", methods=["GET", "POST"])
