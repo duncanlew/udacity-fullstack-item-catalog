@@ -1,19 +1,41 @@
 {% extends 'base.html' %}
 
 {% block index %}
-<h2> {{ shop.name }} </h2>
+<div class="row">
+    <div class="col s12">
+        <h3 class="red-text">{{ shop.name }}</h3>
+    </div>
+</div>
 
-<h3>Make a new product for your shop</h3>
-<form action="{{ url_for('create_product', shop_id=shop.id) }}" method="POST">
-    <p>Product name: </p>
-    <input type="text" size="30" name="name">
-    <p>Product description</p>
-    <input type="text" size="100" name="description">
-    <p>Product price</p>
-    <input type="text" size="30" name="price">
-    <br>
-    <input type='submit' value='Create new product'>
-    <a href="{{ url_for('get_shop', shop_id=shop.id) }}">cancel</a>
+<form class="row" action="{{ url_for('create_product', shop_id=shop.id) }}" method="POST">
+    <div class="col s12">
+        <h6>Create a new product</h6>
+    </div>
+
+    <div class="col s12 input-field">
+        <input id="name" type="text" size="30" name="name" required="required">
+        <label for="name">Product name</label>
+    </div>
+
+    <div class="col s12 input-field">
+        <input id="description" type="text" size="100" name="description" required="required">
+        <label for="description">Description</label>
+    </div>
+
+    <div class="col s12 input-field">
+        <input id="price" type="text" size="30" name="price" required="required">
+        <label for="price">Price</label>
+    </div>
+
+    <div class="col s12">
+        <button class="btn waves-effect waves-light" type="submit" name="action">
+            Submit
+            <i class="material-icons right">send</i>
+        </button>
+        <span>
+            or <a href="{{ url_for('home') }}">go back</a>
+        </span>
+    </div>
 </form>
 
 {% endblock %}

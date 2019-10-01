@@ -77,6 +77,7 @@ def edit_shop(shop_id):
 
 @app.route("/shop/<int:shop_id>/delete", methods=["GET", "POST"])
 def delete_shop(shop_id):
+    username = flask_session.get('username')
     # TODO user authentication needs to be created only the specific user is allowed to do it
     user = db_session.query(User).filter_by(id=1).one()
     shop = db_session.query(ComputerShop).filter_by(id=shop_id).one()
@@ -85,11 +86,12 @@ def delete_shop(shop_id):
         db_session.commit()
         return redirect(url_for('home', username=flask_session.get('username')))
     else:
-        return render_template('shop-delete.html', shop=shop)
+        return render_template('shop-delete.html', shop=shop, username=username)
 
 
 @app.route("/shop/<int:shop_id>/product/new", methods=["GET", "POST"])
 def create_product(shop_id):
+    username = flask_session.get('username')
     # TODO user authentication needs to be created
     user = db_session.query(User).filter_by(id=1).one()
     shop = db_session.query(ComputerShop).filter_by(id=shop_id).one()
@@ -101,16 +103,17 @@ def create_product(shop_id):
                               computer_shop=shop)
         db_session.add(new_product)
         db_session.commit()
-        return redirect(url_for('get_shop', shop_id=shop.id))
+        return redirect(url_for('get_shop', shop_id=shop.id, username=flask_session.get('username')))
     else:
-        return render_template('product-new.html', shop=shop)
+        return render_template('product-new.html', shop=shop, username=username)
 
 
 @app.route("/shop/<int:shop_id>/product/<int:product_id>")
 def get_product(shop_id, product_id):
+    # TODO user authorization needs to be added
     shop = db_session.query(ComputerShop).filter_by(id=shop_id).one()
     product = db_session.query(Product).filter_by(id=product_id).one()
-    return render_template('product.html', shop=shop, product=product)
+    return render_template('product.html', shop=shop, product=product, username=flask_session.get('username'))
 
 
 @app.route("/shop/<int:shop_id>/product/<int:product_id>/edit", methods=["GET", "POST"])
@@ -123,9 +126,10 @@ def edit_product(shop_id, product_id):
         product.price = request.form["price"]
         db_session.add(product)
         db_session.commit()
-        return redirect(url_for('get_product', shop_id=shop_id, product_id=product_id))
+        return redirect(
+            url_for('get_product', shop_id=shop_id, product_id=product_id, username=flask_session.get('username')))
     else:
-        return render_template('product-edit.html', shop=shop, product=product)
+        return render_template('product-edit.html', shop=shop, product=product, username=flask_session.get('username'))
 
 
 @app.route("/shop/<int:shop_id>/product/<int:product_id>/delete", methods=["GET", "POST"])
@@ -137,9 +141,10 @@ def delete_product(shop_id, product_id):
     if request.method == 'POST':
         db_session.delete(product)
         db_session.commit()
-        return redirect(url_for('get_shop', shop_id=shop.id))
+        return redirect(url_for('get_shop', shop_id=shop.id, username=flask_session.get('username')))
     else:
-        return render_template('product-delete.html', shop=shop, product=product)
+        return render_template('product-delete.html', shop=shop, product=product,
+                               username=flask_session.get('username'))
 
 
 @app.route("/login", methods=["GET", "POST"])
