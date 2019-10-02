@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, url_for, session as flask_session
+from flask import Flask, g, render_template, request, redirect, url_for, session as flask_session
 from flask_oauthlib.client import OAuth
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
@@ -29,9 +29,9 @@ def get_twitter_token(token=None):
     return flask_session.get('twitter_token')
 
 
-@app.context_processor
-def inject_user():
-    return dict(username=flask_session.get('username'))
+@app.before_request
+def before_request():
+    g.username = flask_session.get('username')
 
 
 @app.route("/")

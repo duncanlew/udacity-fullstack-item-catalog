@@ -16,10 +16,10 @@
             <div class="nav-wrapper red accent-2">
                 <a href="{{ url_for('home') }}" class="brand-logo center">Computer Shop Aggregator</a>
                 <ul class="right ">
-                    {% if username %}
+                    {% if g.username %}
                     <li><a class="dropdown-trigger" href="#!" data-target="dropdown1">
                         <i class="material-icons left">face</i>
-                        {{username}}
+                        {{ g.username }}
                     </a></li>
 
                     <!-- Dropdown Structure -->
