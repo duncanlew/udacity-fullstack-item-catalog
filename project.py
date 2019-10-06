@@ -34,6 +34,9 @@ def get_twitter_token(token=None):
 
 @app.before_request
 def before_request():
+    # Before every request, retrieve shop and product object
+    # from the database and store them in g for usage
+    # during the processing of the request
     shop_id = request.view_args.get('shop_id')
     product_id = request.view_args.get('product_id')
     g.shop = db_session.query(ComputerShop).filter_by(id=shop_id).first()
@@ -42,6 +45,10 @@ def before_request():
 
 
 def login_required(f):
+    # Login decorator to check if user is actually logged in based on
+    # whether the username is stored in the global object (g)
+    # Source:
+    # https://flask.palletsprojects.com/en/1.1.x/patterns/viewdecorators/
     @wraps(f)
     def decorated_function(*args, **kwargs):
         if g.username is None:
@@ -52,11 +59,13 @@ def login_required(f):
 
 
 def shop_owner_required(f):
+    # Decorator to confirm that the resource (shop/product)
+    # can only be updated by the actual owner
     @wraps(f)
     def decorated_function(*args, **kwargs):
         shop = db_session.query(ComputerShop).filter_by(id=g.shop.id).one()
         if shop.user.username != g.username:
-            abort(401)
+            abort(401)  # Throw back a 401 Unauthorized HTTP response code
         return f(*args, **kwargs)
 
     return decorated_function
@@ -87,9 +96,9 @@ def create_shop():
 @app.route("/shop/<int:shop_id>")
 def get_shop(shop_id):
     shop = g.shop
-    products = db_session\
-        .query(Product)\
-        .filter_by(computer_shop_id=shop.id)\
+    products = db_session \
+        .query(Product) \
+        .filter_by(computer_shop_id=shop.id) \
         .all()
     return render_template('shop.html', shop=shop, products=products)
 
@@ -218,11 +227,15 @@ def twitter_login():
 
 @app.route('/twitter-oauth-authorized')
 def oauth_authorized():
+    # In the case of an empty response, show the error page
+    # indicating that sign in with Twitter has failed.
     resp = twitter.authorized_response()
     if resp is None:
         return render_template('error.html',
                                error_message='Failed to sign in with Twitter')
 
+    # Check if username already exists.
+    # If the username doesn't exist, a new one will be created in the database
     twitter_username = resp['screen_name']
     user = db_session.query(User).filter_by(username=twitter_username).first()
     if not user:
@@ -230,6 +243,8 @@ def oauth_authorized():
         db_session.add(user)
         db_session.commit()
 
+    # Store user information in the session (flask_session) so that the
+    # logged in user can be persisted between requests
     flask_session['username'] = twitter_username
     flask_session['twitter_token'] = (
         resp['oauth_token'],
