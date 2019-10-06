@@ -1,8 +1,8 @@
-from functools import wraps
 from flask import Flask, g, render_template, request, redirect, url_for, session as flask_session, abort
 from flask_oauthlib.client import OAuth
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
+from functools import wraps
 
 from database_model import Base, User, ComputerShop, Product
 
@@ -107,7 +107,7 @@ def edit_shop(shop_id):
 @app.route("/shop/<int:shop_id>/delete", methods=["GET", "POST"])
 @login_required
 @shop_owner_required
-def delete_shop(shop_id):
+def delete_shop():
     shop = g.shop
     if request.method == 'POST':
         db_session.delete(shop)
@@ -120,7 +120,7 @@ def delete_shop(shop_id):
 @app.route("/shop/<int:shop_id>/product/new", methods=["GET", "POST"])
 @login_required
 @shop_owner_required
-def create_product(shop_id):
+def create_product():
     shop = g.shop
     if request.method == 'POST':
         name = request.form['name']
@@ -136,16 +136,16 @@ def create_product(shop_id):
 
 
 @app.route("/shop/<int:shop_id>/product/<int:product_id>")
-def get_product(shop_id, product_id):
-    shop = db_session.query(ComputerShop).filter_by(id=shop_id).one()
-    product = db_session.query(Product).filter_by(id=product_id).one()
+def get_product():
+    shop = g.shop
+    product = g.product
     return render_template('product.html', shop=shop, product=product)
 
 
 @app.route("/shop/<int:shop_id>/product/<int:product_id>/edit", methods=["GET", "POST"])
 @login_required
 @shop_owner_required
-def edit_product(shop_id, product_id):
+def edit_product():
     shop = g.shop
     product = g.product
     if request.method == 'POST':
@@ -163,7 +163,7 @@ def edit_product(shop_id, product_id):
 @app.route("/shop/<int:shop_id>/product/<int:product_id>/delete", methods=["GET", "POST"])
 @login_required
 @shop_owner_required
-def delete_product(shop_id, product_id):
+def delete_product():
     shop = g.shop
     product = g.product
     if request.method == 'POST':
