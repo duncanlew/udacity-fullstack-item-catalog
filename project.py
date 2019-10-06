@@ -5,7 +5,7 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from functools import wraps
 
-from database_model import Base, User, ComputerShop, Product
+from models import Base, User, ComputerShop, Product
 
 app = Flask(__name__)
 app.secret_key = "super secret key"

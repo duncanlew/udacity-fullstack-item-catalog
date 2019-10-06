@@ -1,7 +1,7 @@
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
-from database_model import Base, User, ComputerShop, Product
+from models import Base, User, ComputerShop, Product
 
 engine = create_engine('sqlite:///computer_shop.db')
 # Bind the engine to the metadata of the Base class so that the
