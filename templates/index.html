@@ -2,13 +2,13 @@
 
 {% block index %}
 <div class="row">
-    <div class="col s12"><h3 class="red-text">Available Shops</h3></div>
+    <div class="col s12"><h3>Available Shops</h3></div>
 </div>
 
 {% if g.username %}
 <div class="row">
     <div class="col s12">
-        <a href="{{ url_for('create_shop')}}" class="waves-effect waves-light btn red">
+        <a href="{{ url_for('create_shop')}}" class="waves-effect waves-light btn">
             <i class="material-icons left">add</i>
             Create shop
         </a>
@@ -21,15 +21,15 @@
         <ul class="collection">
             {% for shop in shops %}
             <li class="collection-item">
-                <a class="red-text" href="{{ url_for('get_shop', shop_id=shop.id) }}">
+                <a class="corporate-link" href="{{ url_for('get_shop', shop_id=shop.id) }}">
                     <i class="material-icons">business</i>
                     {{ shop.name }}
                 </a>
                 {% if shop.user.username == g.username %}
-                <a href="{{ url_for('delete_shop', shop_id=shop.id) }}" class="secondary-content red-text">
+                <a class="secondary-content corporate-link" href="{{ url_for('delete_shop', shop_id=shop.id) }}">
                     <i class="material-icons">delete</i>
                 </a>
-                <a href="{{ url_for('edit_shop', shop_id=shop.id) }}" class="secondary-content red-text">
+                <a class="secondary-content corporate-link" href="{{ url_for('edit_shop', shop_id=shop.id) }}">
                     <i class="material-icons">edit</i>
                 </a>
                 {% endif %}

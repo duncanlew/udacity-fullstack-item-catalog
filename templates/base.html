@@ -13,7 +13,7 @@
 <header>
     <div class="navbar-fixed">
         <nav>
-            <div class="nav-wrapper red accent-2">
+            <div class="nav-wrapper">
                 <a href="{{ url_for('home') }}" class="brand-logo center">Computer Shop Aggregator</a>
                 <ul class="right ">
                     {% if g.username %}
@@ -28,7 +28,7 @@
                     </ul>
 
                     {% else %}
-                    <li><a class="waves-effect waves-light btn red" href="{{ url_for('login') }}">Sign in</a></li>
+                    <li><a class="waves-effect waves-light btn" href="{{ url_for('login') }}">Sign in</a></li>
 
                     {% endif %}
                 </ul>
@@ -40,7 +40,7 @@
     {% block index %}
     {% endblock %}
 </main>
-<footer class="page-footer red accent-2">
+<footer class="page-footer">
     <div class="container">
         <div class="row">
             <div class="col l6 s12">
