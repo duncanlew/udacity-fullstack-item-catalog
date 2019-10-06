@@ -1,4 +1,4 @@
-from flask import Flask, g, render_template, request, redirect, url_for, abort
+from flask import Flask, g, render_template, request, redirect, url_for, abort, jsonify
 from flask import session as flask_session
 from flask_oauthlib.client import OAuth
 from sqlalchemy import create_engine
@@ -103,6 +103,16 @@ def get_shop(shop_id):
     return render_template('shop.html', shop=shop, products=products)
 
 
+@app.route("/shop/<int:shop_id>/json")
+def get_shop_json(shop_id):
+    shop = g.shop
+    products = db_session \
+        .query(Product) \
+        .filter_by(computer_shop_id=shop.id) \
+        .all()
+    return jsonify(shop=shop.serialize, products=[product.serialize for product in products])
+
+
 @app.route("/shop/<int:shop_id>/edit", methods=["GET", "POST"])
 @login_required
 @shop_owner_required
@@ -154,6 +164,13 @@ def get_product(shop_id, product_id):
     shop = g.shop
     product = g.product
     return render_template('product.html', shop=shop, product=product)
+
+
+@app.route("/shop/<int:shop_id>/product/<int:product_id>/json", methods=["GET"])
+def get_product_json(shop_id, product_id):
+    shop = g.shop
+    product = g.product
+    return jsonify(shop=shop.serialize, product=product.serialize)
 
 
 @app.route(
