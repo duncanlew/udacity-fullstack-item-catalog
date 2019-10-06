@@ -176,23 +176,20 @@ def delete_product():
 
 @app.route("/login", methods=["GET", "POST"])
 def login():
-    login_incorrect = False
     if request.method == "POST":
         username = request.form['email']
         password = request.form['password']
         user = db_session.query(User).filter_by(username=username).first()
         if not user or not user.verify_password(password):
-            login_incorrect = True
-            return render_template('login.html', login_incorrect=login_incorrect)
+            return render_template('login.html', login_incorrect=True)
         else:
             flask_session['username'] = username
-            return '<h1>Login successful!</h1><div>{0}</div>'.format(username)
+            return redirect(url_for('home'))
     else:
         if 'username' in flask_session:
-            username = flask_session['username']
-            return '<h1>Hello {0}, you\'re already logged in</h1>'.format(username)
+            return redirect(url_for('home'))
         else:
-            return render_template('login.html', login_incorrect=login_incorrect)
+            return render_template('login.html', login_incorrect=False)
 
 
 @app.route('/twitter-login')
@@ -204,12 +201,9 @@ def twitter_login():
 
 @app.route('/twitter-oauth-authorized')
 def oauth_authorized():
-    next_url = request.args.get('next') or url_for('home')  # TODO this might not be that needed
     resp = twitter.authorized_response()
     if resp is None:
-        # TODO remove this or add something in html
-        # flash(u'You denied the request to sign in.')
-        return redirect(next_url)
+        return render_template('error.html', error_message='Failed to sign in with Twitter')
 
     twitter_username = resp['screen_name']
     user = db_session.query(User).filter_by(username=twitter_username).first()
@@ -224,8 +218,7 @@ def oauth_authorized():
         resp['oauth_token_secret']
     )
 
-    # TODO where to redirect to
-    return redirect(url_for('login'))
+    return redirect(url_for('home'))
 
 
 @app.route("/logout", methods=["GET", "POST"])
