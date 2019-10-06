@@ -26,6 +26,12 @@ class ComputerShop(Base):
     user_id = Column(Integer, ForeignKey('user.id'))
     user = relationship(User)
 
+    @property
+    def serialize(self):
+        return {
+            'name': self.name,
+        }
+
 
 class Product(Base):
     __tablename__ = "product"
@@ -35,6 +41,14 @@ class Product(Base):
     price = Column(String(8))
     computer_shop_id = Column(Integer, ForeignKey('computer_shop.id'))
     computer_shop = relationship(ComputerShop)
+
+    @property
+    def serialize(self):
+        return {
+            'name': self.name,
+            'description': self.description,
+            'price': self.price
+        }
 
 
 engine = create_engine('sqlite:///computer_shop.db')
