@@ -84,7 +84,7 @@ def create_shop():
 
 @app.route("/shop/<int:shop_id>")
 def get_shop(shop_id):
-    shop = db_session.query(ComputerShop).filter_by(id=shop_id).one()
+    shop = g.shop
     products = db_session.query(Product).filter_by(computer_shop_id=shop.id).all()
     return render_template('shop.html', shop=shop, products=products)
 
@@ -99,7 +99,7 @@ def edit_shop(shop_id):
             shop.name = request.form['name']
             db_session.add(shop)
             db_session.commit()
-        return redirect(url_for('get_shop', shop_id=shop_id))
+        return redirect(url_for('get_shop', shop_id=shop.id))
     else:
         return render_template('shop-edit.html', shop=shop)
 
@@ -107,7 +107,7 @@ def edit_shop(shop_id):
 @app.route("/shop/<int:shop_id>/delete", methods=["GET", "POST"])
 @login_required
 @shop_owner_required
-def delete_shop():
+def delete_shop(shop_id):
     shop = g.shop
     if request.method == 'POST':
         db_session.delete(shop)
@@ -120,7 +120,7 @@ def delete_shop():
 @app.route("/shop/<int:shop_id>/product/new", methods=["GET", "POST"])
 @login_required
 @shop_owner_required
-def create_product():
+def create_product(shop_id):
     shop = g.shop
     if request.method == 'POST':
         name = request.form['name']
@@ -136,7 +136,7 @@ def create_product():
 
 
 @app.route("/shop/<int:shop_id>/product/<int:product_id>")
-def get_product():
+def get_product(shop_id, product_id):
     shop = g.shop
     product = g.product
     return render_template('product.html', shop=shop, product=product)
@@ -145,7 +145,7 @@ def get_product():
 @app.route("/shop/<int:shop_id>/product/<int:product_id>/edit", methods=["GET", "POST"])
 @login_required
 @shop_owner_required
-def edit_product():
+def edit_product(shop_id, product_id):
     shop = g.shop
     product = g.product
     if request.method == 'POST':
@@ -163,7 +163,7 @@ def edit_product():
 @app.route("/shop/<int:shop_id>/product/<int:product_id>/delete", methods=["GET", "POST"])
 @login_required
 @shop_owner_required
-def delete_product():
+def delete_product(shop_id, product_id):
     shop = g.shop
     product = g.product
     if request.method == 'POST':
