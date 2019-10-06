@@ -1,4 +1,5 @@
-from flask import Flask, g, render_template, request, redirect, url_for, session as flask_session, abort
+from flask import Flask, g, render_template, request, redirect, url_for, abort
+from flask import session as flask_session
 from flask_oauthlib.client import OAuth
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
@@ -15,14 +16,15 @@ Base.metadata.bind = engine
 DBSession = sessionmaker(bind=engine)
 db_session = DBSession()
 
-twitter = oauth.remote_app('twitter',
-                           base_url='https://api.twitter.com/1/',
-                           request_token_url='https://api.twitter.com/oauth/request_token',
-                           access_token_url='https://api.twitter.com/oauth/access_token',
-                           authorize_url='https://api.twitter.com/oauth/authenticate',
-                           consumer_key='YOUR_CONSUMER_KEY',
-                           consumer_secret='YOUR_CONSUMER_SECRET'
-                           )
+twitter = oauth.remote_app(
+    'twitter',
+    base_url='https://api.twitter.com/1/',
+    request_token_url='https://api.twitter.com/oauth/request_token',
+    access_token_url='https://api.twitter.com/oauth/access_token',
+    authorize_url='https://api.twitter.com/oauth/authenticate',
+    consumer_key='YOUR_CONSUMER_KEY',
+    consumer_secret='YOUR_CONSUMER_SECRET'
+)
 
 
 @twitter.tokengetter
@@ -85,7 +87,10 @@ def create_shop():
 @app.route("/shop/<int:shop_id>")
 def get_shop(shop_id):
     shop = g.shop
-    products = db_session.query(Product).filter_by(computer_shop_id=shop.id).all()
+    products = db_session\
+        .query(Product)\
+        .filter_by(computer_shop_id=shop.id)\
+        .all()
     return render_template('shop.html', shop=shop, products=products)
 
 
