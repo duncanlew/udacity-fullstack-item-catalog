@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+
+{% block index %}
+<div class="row">
+    <div class="col s12">
+        <h3 class="red-text">Oops... there was an error</h3>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col s12">
+        <i class="material-icons">error_outline</i>
+        <span>{{ error_message }}</span>
+    </div>
+</div>
+
+{% endblock %}

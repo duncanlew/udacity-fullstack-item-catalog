@@ -1,7 +1,8 @@
-from flask import Flask, render_template, request, redirect, url_for, session as flask_session
+from flask import Flask, g, render_template, request, redirect, url_for, session as flask_session, abort
 from flask_oauthlib.client import OAuth
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
+from functools import wraps
 
 from database_model import Base, User, ComputerShop, Product
 
@@ -29,20 +30,48 @@ def get_twitter_token(token=None):
     return flask_session.get('twitter_token')
 
 
+@app.before_request
+def before_request():
+    shop_id = request.view_args.get('shop_id')
+    product_id = request.view_args.get('product_id')
+    g.shop = db_session.query(ComputerShop).filter_by(id=shop_id).first()
+    g.product = db_session.query(Product).filter_by(id=product_id).first()
+    g.username = flask_session.get('username')
+
+
+def login_required(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if g.username is None:
+            return redirect(url_for('login', next=request.url))
+        return f(*args, **kwargs)
+
+    return decorated_function
+
+
+def shop_owner_required(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        shop = db_session.query(ComputerShop).filter_by(id=g.shop.id).one()
+        if shop.user.username != g.username:
+            abort(401)
+        return f(*args, **kwargs)
+
+    return decorated_function
+
+
 @app.route("/")
 @app.route("/shops")
 def home():
-    username = flask_session.get('username')
     shops = db_session.query(ComputerShop).all()
-    return render_template('index.html', shops=shops, username=username)
+    return render_template('index.html', shops=shops)
 
 
 @app.route("/shop/new", methods=["GET", "POST"])
+@login_required
 def create_shop():
     username = flask_session.get('username')
     user = db_session.query(User).filter_by(username=username).one()
-    # TODO if user does not exist redirect please
-
     if request.method == 'POST':
         if request.form['name']:
             new_shop = ComputerShop(name=request.form['name'], user=user)
@@ -50,51 +79,49 @@ def create_shop():
             db_session.commit()
         return redirect(url_for('home'))
     else:
-        return render_template('shop-new.html', username=username)
+        return render_template('shop-new.html')
 
 
 @app.route("/shop/<int:shop_id>")
 def get_shop(shop_id):
     shop = db_session.query(ComputerShop).filter_by(id=shop_id).one()
     products = db_session.query(Product).filter_by(computer_shop_id=shop.id).all()
-    return render_template('shop.html', shop=shop, products=products, username=flask_session.get('username'))
+    return render_template('shop.html', shop=shop, products=products)
 
 
 @app.route("/shop/<int:shop_id>/edit", methods=["GET", "POST"])
+@login_required
+@shop_owner_required
 def edit_shop(shop_id):
-    # TODO authorization needs to be added that it is the right user
-    username = flask_session.get('username')
-    shop = db_session.query(ComputerShop).filter_by(id=shop_id).one()
+    shop = g.shop
     if request.method == 'POST':
         if request.form['name']:
             shop.name = request.form['name']
             db_session.add(shop)
             db_session.commit()
-        return redirect(url_for('get_shop', shop_id=shop_id, username=username))
+        return redirect(url_for('get_shop', shop_id=shop_id))
     else:
-        return render_template('shop-edit.html', shop=shop, username=username)
+        return render_template('shop-edit.html', shop=shop)
 
 
 @app.route("/shop/<int:shop_id>/delete", methods=["GET", "POST"])
-def delete_shop(shop_id):
-    username = flask_session.get('username')
-    # TODO user authentication needs to be created only the specific user is allowed to do it
-    user = db_session.query(User).filter_by(id=1).one()
-    shop = db_session.query(ComputerShop).filter_by(id=shop_id).one()
+@login_required
+@shop_owner_required
+def delete_shop():
+    shop = g.shop
     if request.method == 'POST':
         db_session.delete(shop)
         db_session.commit()
-        return redirect(url_for('home', username=flask_session.get('username')))
+        return redirect(url_for('home'))
     else:
-        return render_template('shop-delete.html', shop=shop, username=username)
+        return render_template('shop-delete.html', shop=shop)
 
 
 @app.route("/shop/<int:shop_id>/product/new", methods=["GET", "POST"])
-def create_product(shop_id):
-    username = flask_session.get('username')
-    # TODO user authentication needs to be created
-    user = db_session.query(User).filter_by(id=1).one()
-    shop = db_session.query(ComputerShop).filter_by(id=shop_id).one()
+@login_required
+@shop_owner_required
+def create_product():
+    shop = g.shop
     if request.method == 'POST':
         name = request.form['name']
         description = request.form['description']
@@ -103,23 +130,24 @@ def create_product(shop_id):
                               computer_shop=shop)
         db_session.add(new_product)
         db_session.commit()
-        return redirect(url_for('get_shop', shop_id=shop.id, username=flask_session.get('username')))
+        return redirect(url_for('get_shop', shop_id=shop.id))
     else:
-        return render_template('product-new.html', shop=shop, username=username)
+        return render_template('product-new.html', shop=shop)
 
 
 @app.route("/shop/<int:shop_id>/product/<int:product_id>")
-def get_product(shop_id, product_id):
-    # TODO user authorization needs to be added
-    shop = db_session.query(ComputerShop).filter_by(id=shop_id).one()
-    product = db_session.query(Product).filter_by(id=product_id).one()
-    return render_template('product.html', shop=shop, product=product, username=flask_session.get('username'))
+def get_product():
+    shop = g.shop
+    product = g.product
+    return render_template('product.html', shop=shop, product=product)
 
 
 @app.route("/shop/<int:shop_id>/product/<int:product_id>/edit", methods=["GET", "POST"])
-def edit_product(shop_id, product_id):
-    shop = db_session.query(ComputerShop).filter_by(id=shop_id).one()
-    product = db_session.query(Product).filter_by(id=product_id).one()
+@login_required
+@shop_owner_required
+def edit_product():
+    shop = g.shop
+    product = g.product
     if request.method == 'POST':
         product.name = request.form["name"]
         product.description = request.form["description"]
@@ -127,45 +155,41 @@ def edit_product(shop_id, product_id):
         db_session.add(product)
         db_session.commit()
         return redirect(
-            url_for('get_product', shop_id=shop_id, product_id=product_id, username=flask_session.get('username')))
+            url_for('get_product', shop_id=shop.id, product_id=product.id))
     else:
-        return render_template('product-edit.html', shop=shop, product=product, username=flask_session.get('username'))
+        return render_template('product-edit.html', shop=shop, product=product)
 
 
 @app.route("/shop/<int:shop_id>/product/<int:product_id>/delete", methods=["GET", "POST"])
-def delete_product(shop_id, product_id):
-    # TODO user authentication needs to be created
-    user = db_session.query(User).filter_by(id=1).one()
-    shop = db_session.query(ComputerShop).filter_by(id=shop_id).one()
-    product = db_session.query(Product).filter_by(id=product_id).one()
+@login_required
+@shop_owner_required
+def delete_product():
+    shop = g.shop
+    product = g.product
     if request.method == 'POST':
         db_session.delete(product)
         db_session.commit()
-        return redirect(url_for('get_shop', shop_id=shop.id, username=flask_session.get('username')))
+        return redirect(url_for('get_shop', shop_id=shop.id))
     else:
-        return render_template('product-delete.html', shop=shop, product=product,
-                               username=flask_session.get('username'))
+        return render_template('product-delete.html', shop=shop, product=product)
 
 
 @app.route("/login", methods=["GET", "POST"])
 def login():
-    login_incorrect = False
     if request.method == "POST":
         username = request.form['email']
         password = request.form['password']
         user = db_session.query(User).filter_by(username=username).first()
         if not user or not user.verify_password(password):
-            login_incorrect = True
-            return render_template('login.html', login_incorrect=login_incorrect)
+            return render_template('login.html', login_incorrect=True)
         else:
             flask_session['username'] = username
-            return '<h1>Login successful!</h1><div>{0}</div>'.format(username)
+            return redirect(url_for('home'))
     else:
         if 'username' in flask_session:
-            username = flask_session['username']
-            return '<h1>Hello {0}, you\'re already logged in</h1>'.format(username)
+            return redirect(url_for('home'))
         else:
-            return render_template('login.html', login_incorrect=login_incorrect)
+            return render_template('login.html', login_incorrect=False)
 
 
 @app.route('/twitter-login')
@@ -177,12 +201,9 @@ def twitter_login():
 
 @app.route('/twitter-oauth-authorized')
 def oauth_authorized():
-    next_url = request.args.get('next') or url_for('home')  # TODO this might not be that needed
     resp = twitter.authorized_response()
     if resp is None:
-        # TODO remove this or add something in html
-        # flash(u'You denied the request to sign in.')
-        return redirect(next_url)
+        return render_template('error.html', error_message='Failed to sign in with Twitter')
 
     twitter_username = resp['screen_name']
     user = db_session.query(User).filter_by(username=twitter_username).first()
@@ -197,8 +218,7 @@ def oauth_authorized():
         resp['oauth_token_secret']
     )
 
-    # TODO where to redirect to
-    return redirect(url_for('login'))
+    return redirect(url_for('home'))
 
 
 @app.route("/logout", methods=["GET", "POST"])

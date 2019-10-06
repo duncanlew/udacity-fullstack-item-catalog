@@ -1,22 +1,48 @@
 {% extends 'base.html' %}
 
 {% block index %}
-<h2>Login</h2>
-{% if login_incorrect %}
-<h3>Incorrect credentials!</h3>
-{% endif %}
-<form action="{{ url_for('login') }}" method="POST">
-    <p>Email</p>
-    <input type="text" size="30" name="email">
-    <p>Password</p>
-    <input type="password" size="30" name="password" required>
-    <br>
-    <input type='submit' value='Login'>
-    <a href="{{ url_for('home') }}">cancel</a>
+<div class="row">
+    <div class="col s12">
+        <h3 class="red-text">Login</h3>
+        {% if login_incorrect %}
+        <h3>Incorrect credentials!</h3>
+        {% endif %}
+    </div>
+</div>
+
+<div class="row">
+    <div class="col s12"><h6>Sign in with Twitter</h6></div>
+    <div class="col s12">
+        <a href="{{ url_for('twitter_login') }}">
+            <img src="{{url_for('static', filename='sign-in.png')}}" alt="sign in">
+        </a>
+    </div>
+</div>
+
+<form class="row" action="{{ url_for('login') }}" method="POST">
+    <div class="col s12">
+        <h6>Sign in with username or email</h6>
+    </div>
+
+    <div class="col s12 input-field">
+        <input id="email" type="text" size="30" name="email">
+        <label for="email">Email</label>
+    </div>
+
+    <div class="col s12 input-field">
+        <input id="password" type="password" size="30" name="password" required>
+        <label for="password">Password</label>
+    </div>
+
+    <div class="col s12">
+        <button class="btn waves-effect waves-light red" type="submit" name="action">
+            Sign in
+            <i class="material-icons right">send</i>
+        </button>
+        <span>
+            or <a href="{{ url_for('home') }}">go back</a>
+        </span>
+    </div>
 </form>
-
-Sign in with twitter.
-
-<a href="{{ url_for('twitter_login') }}"><img src="{{
-        url_for('static', filename='sign-in.png')}}" alt="sign in"></a>
+    
 {% endblock %}
