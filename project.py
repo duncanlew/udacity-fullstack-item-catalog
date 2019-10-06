@@ -147,7 +147,11 @@ def get_product(shop_id, product_id):
     return render_template('product.html', shop=shop, product=product)
 
 
-@app.route("/shop/<int:shop_id>/product/<int:product_id>/edit", methods=["GET", "POST"])
+@app.route(
+    "/shop/<int:shop_id>/product/<int:product_id>/edit",
+    methods=[
+        "GET",
+        "POST"])
 @login_required
 @shop_owner_required
 def edit_product(shop_id, product_id):
@@ -165,7 +169,11 @@ def edit_product(shop_id, product_id):
         return render_template('product-edit.html', shop=shop, product=product)
 
 
-@app.route("/shop/<int:shop_id>/product/<int:product_id>/delete", methods=["GET", "POST"])
+@app.route(
+    "/shop/<int:shop_id>/product/<int:product_id>/delete",
+    methods=[
+        "GET",
+        "POST"])
 @login_required
 @shop_owner_required
 def delete_product(shop_id, product_id):
@@ -176,7 +184,10 @@ def delete_product(shop_id, product_id):
         db_session.commit()
         return redirect(url_for('get_shop', shop_id=shop.id))
     else:
-        return render_template('product-delete.html', shop=shop, product=product)
+        return render_template(
+            'product-delete.html',
+            shop=shop,
+            product=product)
 
 
 @app.route("/login", methods=["GET", "POST"])
@@ -200,15 +211,17 @@ def login():
 @app.route('/twitter-login')
 def twitter_login():
     return twitter.authorize(
-        callback=url_for('oauth_authorized',
-                         next=request.args.get('next') or request.referrer or None))
+        callback=url_for(
+            'oauth_authorized',
+            next=request.args.get('next') or request.referrer or None))
 
 
 @app.route('/twitter-oauth-authorized')
 def oauth_authorized():
     resp = twitter.authorized_response()
     if resp is None:
-        return render_template('error.html', error_message='Failed to sign in with Twitter')
+        return render_template('error.html',
+                               error_message='Failed to sign in with Twitter')
 
     twitter_username = resp['screen_name']
     user = db_session.query(User).filter_by(username=twitter_username).first()
