@@ -1,4 +1,5 @@
-from flask import Flask, g, render_template, request, redirect, url_for, session as flask_session, abort
+from flask import Flask, g, render_template, request, redirect, url_for, abort
+from flask import session as flask_session
 from flask_oauthlib.client import OAuth
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
@@ -15,14 +16,15 @@ Base.metadata.bind = engine
 DBSession = sessionmaker(bind=engine)
 db_session = DBSession()
 
-twitter = oauth.remote_app('twitter',
-                           base_url='https://api.twitter.com/1/',
-                           request_token_url='https://api.twitter.com/oauth/request_token',
-                           access_token_url='https://api.twitter.com/oauth/access_token',
-                           authorize_url='https://api.twitter.com/oauth/authenticate',
-                           consumer_key='YOUR_CONSUMER_KEY',
-                           consumer_secret='YOUR_CONSUMER_SECRET'
-                           )
+twitter = oauth.remote_app(
+    'twitter',
+    base_url='https://api.twitter.com/1/',
+    request_token_url='https://api.twitter.com/oauth/request_token',
+    access_token_url='https://api.twitter.com/oauth/access_token',
+    authorize_url='https://api.twitter.com/oauth/authenticate',
+    consumer_key='YOUR_CONSUMER_KEY',
+    consumer_secret='YOUR_CONSUMER_SECRET'
+)
 
 
 @twitter.tokengetter
@@ -84,8 +86,11 @@ def create_shop():
 
 @app.route("/shop/<int:shop_id>")
 def get_shop(shop_id):
-    shop = db_session.query(ComputerShop).filter_by(id=shop_id).one()
-    products = db_session.query(Product).filter_by(computer_shop_id=shop.id).all()
+    shop = g.shop
+    products = db_session\
+        .query(Product)\
+        .filter_by(computer_shop_id=shop.id)\
+        .all()
     return render_template('shop.html', shop=shop, products=products)
 
 
@@ -99,7 +104,7 @@ def edit_shop(shop_id):
             shop.name = request.form['name']
             db_session.add(shop)
             db_session.commit()
-        return redirect(url_for('get_shop', shop_id=shop_id))
+        return redirect(url_for('get_shop', shop_id=shop.id))
     else:
         return render_template('shop-edit.html', shop=shop)
 
@@ -107,7 +112,7 @@ def edit_shop(shop_id):
 @app.route("/shop/<int:shop_id>/delete", methods=["GET", "POST"])
 @login_required
 @shop_owner_required
-def delete_shop():
+def delete_shop(shop_id):
     shop = g.shop
     if request.method == 'POST':
         db_session.delete(shop)
@@ -120,7 +125,7 @@ def delete_shop():
 @app.route("/shop/<int:shop_id>/product/new", methods=["GET", "POST"])
 @login_required
 @shop_owner_required
-def create_product():
+def create_product(shop_id):
     shop = g.shop
     if request.method == 'POST':
         name = request.form['name']
@@ -136,16 +141,20 @@ def create_product():
 
 
 @app.route("/shop/<int:shop_id>/product/<int:product_id>")
-def get_product():
+def get_product(shop_id, product_id):
     shop = g.shop
     product = g.product
     return render_template('product.html', shop=shop, product=product)
 
 
-@app.route("/shop/<int:shop_id>/product/<int:product_id>/edit", methods=["GET", "POST"])
+@app.route(
+    "/shop/<int:shop_id>/product/<int:product_id>/edit",
+    methods=[
+        "GET",
+        "POST"])
 @login_required
 @shop_owner_required
-def edit_product():
+def edit_product(shop_id, product_id):
     shop = g.shop
     product = g.product
     if request.method == 'POST':
@@ -160,10 +169,14 @@ def edit_product():
         return render_template('product-edit.html', shop=shop, product=product)
 
 
-@app.route("/shop/<int:shop_id>/product/<int:product_id>/delete", methods=["GET", "POST"])
+@app.route(
+    "/shop/<int:shop_id>/product/<int:product_id>/delete",
+    methods=[
+        "GET",
+        "POST"])
 @login_required
 @shop_owner_required
-def delete_product():
+def delete_product(shop_id, product_id):
     shop = g.shop
     product = g.product
     if request.method == 'POST':
@@ -171,7 +184,10 @@ def delete_product():
         db_session.commit()
         return redirect(url_for('get_shop', shop_id=shop.id))
     else:
-        return render_template('product-delete.html', shop=shop, product=product)
+        return render_template(
+            'product-delete.html',
+            shop=shop,
+            product=product)
 
 
 @app.route("/login", methods=["GET", "POST"])
@@ -195,15 +211,17 @@ def login():
 @app.route('/twitter-login')
 def twitter_login():
     return twitter.authorize(
-        callback=url_for('oauth_authorized',
-                         next=request.args.get('next') or request.referrer or None))
+        callback=url_for(
+            'oauth_authorized',
+            next=request.args.get('next') or request.referrer or None))
 
 
 @app.route('/twitter-oauth-authorized')
 def oauth_authorized():
     resp = twitter.authorized_response()
     if resp is None:
-        return render_template('error.html', error_message='Failed to sign in with Twitter')
+        return render_template('error.html',
+                               error_message='Failed to sign in with Twitter')
 
     twitter_username = resp['screen_name']
     user = db_session.query(User).filter_by(username=twitter_username).first()

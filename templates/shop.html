@@ -3,14 +3,14 @@
 {% block index %}
 <div class="row">
     <div class="col s12">
-        <h3 class="red-text">{{ shop.name }}</h3>
+        <h3>{{ shop.name }}</h3>
     </div>
 </div>
 
 {% if shop.user.username == g.username %}
 <div class="row">
     <div class="col s12">
-        <a href="{{ url_for('create_product', shop_id=shop.id)}}" class="waves-effect waves-light btn red">
+        <a href="{{ url_for('create_product', shop_id=shop.id)}}" class="waves-effect waves-light btn">
             <i class="material-icons left">add</i>
             Create product
         </a>
@@ -42,15 +42,15 @@
                     {% if shop.user.username == g.username %}
                     <div>
                         <a href="{{ url_for('edit_product', shop_id=shop.id, product_id=product.id)}}"
-                           class="btn-floating btn waves-effect waves-light red">
+                           class="btn-floating btn waves-effect waves-light">
                             <i class="material-icons left">edit</i>
                         </a>
                         <a href="{{ url_for('delete_product', shop_id=shop.id, product_id=product.id)}}"
-                           class="btn-floating btn waves-effect waves-light red">
+                           class="btn-floating btn waves-effect waves-light">
                             <i class="material-icons left">delete</i>
                         </a>
                         <a href="{{ url_for('get_product', shop_id=shop.id, product_id=product.id)}}"
-                           class="btn-floating btn waves-effect waves-light red">
+                           class="btn-floating btn waves-effect waves-light">
                             <i class="material-icons left">open_in_new</i>
                         </a>
                     </div>
