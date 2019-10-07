@@ -37,8 +37,13 @@ def before_request():
     # Before every request, retrieve shop and product object
     # from the database and store them in g for usage
     # during the processing of the request
-    shop_id = request.view_args.get('shop_id')
-    product_id = request.view_args.get('product_id')
+    shop_id = None
+    product_id = None
+    try:
+        shop_id = request.view_args.get('shop_id')
+        product_id = request.view_args.get('product_id')
+    except AttributeError:
+        pass
     g.shop = db_session.query(ComputerShop).filter_by(id=shop_id).first()
     g.product = db_session.query(Product).filter_by(id=product_id).first()
     g.username = flask_session.get('username')
